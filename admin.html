@@ -342,21 +342,22 @@
             margin-top: 5px;
         }
 
-        .status-badge {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
+        .file-input-group {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            background: var(--bg);
         }
 
-        .status-online {
-            background: var(--success);
-            box-shadow: 0 0 5px var(--success);
+        .file-input-group input {
+            border: none;
+            padding: 10px 0;
         }
 
-        .status-offline {
-            background: var(--error);
+        .upload-status {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            color: var(--success);
         }
     </style>
 </head>
@@ -365,7 +366,7 @@
         <div class="admin-header-content">
             <div class="logo">CHOIR<span>ARCHIVE</span> · ADMIN</div>
             <div>
-                <span class="admin-badge"><span id="connectionStatus" class="status-badge status-offline"></span> 🔐 Admin Console</span>
+                <span class="admin-badge">🔐 Admin Console</span>
                 <a href="index.html" class="view-site">← View Site</a>
             </div>
         </div>
@@ -429,21 +430,29 @@
                         <div class="form-group">
                             <label>Slug (URL identifier) <span class="required">*</span></label>
                             <input type="text" id="slug" required placeholder="e.g., ave-maria-schubert">
-                            <div class="slug-preview">🔗 Will be: https://choir-archive-backendd.onrender.com/api/songs/your-slug</div>
+                            <div class="slug-preview">🔗 URL: /songs/your-slug</div>
                         </div>
 
                         <div class="form-group">
-                            <label>PDF URL (Cloudinary link)</label>
-                            <input type="url" id="pdfUrl" placeholder="https://res.cloudinary.com/.../song.pdf">
+                            <label>PDF File <span class="required">*</span></label>
+                            <div class="file-input-group">
+                                <input type="file" id="pdfFile" accept=".pdf,.jpg,.jpeg,.png">
+                                <div id="pdfStatus" class="upload-status"></div>
+                            </div>
+                            <input type="hidden" id="pdfUrl">
                         </div>
 
                         <div class="form-group">
-                            <label>Audio URL (optional)</label>
-                            <input type="url" id="audioUrl" placeholder="https://.../audio.mp3">
+                            <label>Audio File (optional)</label>
+                            <div class="file-input-group">
+                                <input type="file" id="audioFile" accept=".mp3,.m4a,.wav,.ogg">
+                                <div id="audioStatus" class="upload-status"></div>
+                            </div>
+                            <input type="hidden" id="audioUrl">
                         </div>
 
                         <div class="form-group">
-                            <label>When to Sing (liturgical context)</label>
+                            <label>When to Sing</label>
                             <textarea id="whenToSing" placeholder="e.g., During Offertory, Advent season, Funeral Mass..."></textarea>
                         </div>
 
@@ -473,9 +482,9 @@
                                 <tr><th>Title / Composer</th><th>Category</th><th>Language</th><th style="width:60px"></th></tr>
                             </thead>
                             <tbody id="songsTableBody">
-                                <tr><td colspan="4" class="loading"><div class="spinner"></div> Connecting to server...</td></tr>
+                                <tr><td colspan="4" class="loading"><div class="spinner"></div> Loading...</td></tr>
                             </tbody>
-                         </table>
+                        </table>
                     </div>
                     <div class="button-group" style="margin-top: 20px; justify-content: flex-end;">
                         <button id="refreshBtn" class="btn btn-secondary btn-sm">⟳ Refresh</button>
@@ -486,26 +495,7 @@
     </div>
 
     <script>
-        // Your actual backend URL
         const API_BASE = 'https://choir-archive-backendd.onrender.com/api';
-        
-        // Test connection on load
-        async function testConnection() {
-            const statusDot = document.getElementById('connectionStatus');
-            try {
-                const response = await fetch(`${API_BASE}/songs`);
-                if (response.ok) {
-                    statusDot.className = 'status-badge status-online';
-                    showAlert('✅ Connected to backend successfully!', 'success');
-                } else {
-                    statusDot.className = 'status-badge status-offline';
-                    showAlert(`⚠️ Backend returned status ${response.status}`, 'error');
-                }
-            } catch (error) {
-                statusDot.className = 'status-badge status-offline';
-                showAlert(`⚠️ Cannot connect to ${API_BASE}. Make sure your backend is running.`, 'error');
-            }
-        }
 
         function showAlert(message, type = 'info') {
             const container = document.getElementById('alertContainer');
@@ -514,19 +504,109 @@
             alert.innerHTML = message;
             container.innerHTML = '';
             container.appendChild(alert);
-            setTimeout(() => {
-                if (alert.parentNode) alert.remove();
-            }, 5000);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        async function uploadFile(file, type) {
+            if (!file) return null;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const statusDiv = document.getElementById(`${type}Status`);
+            statusDiv.innerHTML = '<span class="spinner"></span> Uploading...';
+            statusDiv.style.color = '#666';
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload/${type}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) throw new Error(result.message);
+                
+                statusDiv.innerHTML = `✅ Uploaded successfully!`;
+                statusDiv.style.color = 'var(--success)';
+                return result.url;
+            } catch (error) {
+                statusDiv.innerHTML = `❌ Upload failed: ${error.message}`;
+                statusDiv.style.color = 'var(--error)';
+                return null;
+            }
+        }
+
+        async function addSong(event) {
+            event.preventDefault();
+            
+            const pdfFile = document.getElementById('pdfFile').files[0];
+            if (!pdfFile) {
+                showAlert('Please select a PDF file', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Uploading files...';
+            
+            // Upload PDF
+            const pdfUrl = await uploadFile(pdfFile, 'pdf');
+            if (!pdfUrl) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '➕ Add Song to Archive';
+                return;
+            }
+            
+            // Upload Audio (if selected)
+            const audioFile = document.getElementById('audioFile').files[0];
+            let audioUrl = null;
+            if (audioFile) {
+                submitBtn.textContent = '⏳ Uploading audio...';
+                audioUrl = await uploadFile(audioFile, 'audio');
+            }
+            
+            const songData = {
+                slug: document.getElementById('slug').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                composer: document.getElementById('composer').value.trim(),
+                category: document.getElementById('category').value,
+                language: document.getElementById('language').value,
+                description: document.getElementById('description').value.trim(),
+                whenToSing: document.getElementById('whenToSing').value.trim(),
+                pdfUrl: pdfUrl,
+                audioUrl: audioUrl || ''
+            };
+            
+            if (!songData.slug) {
+                songData.slug = songData.title.toLowerCase().replace(/\s+/g, '-') + '-' + songData.composer.toLowerCase().split(' ')[0];
+            }
+            
+            submitBtn.textContent = '⏳ Saving to database...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(songData)
+                });
+                
+                if (!response.ok) throw new Error('Failed to save song');
+                
+                showAlert(`✅ "${songData.title}" has been added!`, 'success');
+                resetForm();
+                fetchSongs();
+            } catch (error) {
+                showAlert(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '➕ Add Song to Archive';
+            }
         }
 
         function generateSlug(title, composer) {
-            let slug = title.toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/--+/g, '-');
-            if (composer) {
-                slug += '-' + composer.toLowerCase().split(' ')[0];
-            }
+            let slug = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+            if (composer) slug += '-' + composer.toLowerCase().split(' ')[0];
             return slug;
         }
 
@@ -548,24 +628,23 @@
 
         async function fetchSongs() {
             const tbody = document.getElementById('songsTableBody');
-            tbody.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div> Loading songs...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div> Loading...</td></tr>';
             
             try {
                 const response = await fetch(`${API_BASE}/songs`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) throw new Error('Failed to fetch');
                 const songs = await response.json();
                 renderSongsTable(songs);
                 document.getElementById('songCount').innerHTML = `${songs.length} song${songs.length !== 1 ? 's' : ''}`;
             } catch (error) {
-                console.error('Fetch error:', error);
-                tbody.innerHTML = `<tr><td colspan="4" class="empty-state">❌ Cannot connect to server. Make sure backend is running at ${API_BASE}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="empty-state">❌ Cannot connect to server</td></tr>`;
             }
         }
 
         function renderSongsTable(songs) {
             const tbody = document.getElementById('songsTableBody');
             if (!songs.length) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">📭 No songs yet. Add your first song using the form!</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">📭 No songs yet. Add your first song!</td></tr>';
                 return;
             }
             
@@ -587,71 +666,23 @@
         }
 
         async function deleteSong(slug, title) {
-            if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
-            
+            if (!confirm(`Delete "${title}"?`)) return;
             try {
                 const response = await fetch(`${API_BASE}/songs/${slug}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error('Delete failed');
-                showAlert(`✅ "${title}" has been deleted.`, 'success');
+                showAlert(`✅ "${title}" deleted`, 'success');
                 fetchSongs();
             } catch (error) {
-                showAlert(`❌ Delete failed: ${error.message}`, 'error');
-            }
-        }
-
-        async function addSong(event) {
-            event.preventDefault();
-            
-            const songData = {
-                slug: document.getElementById('slug').value.trim(),
-                title: document.getElementById('title').value.trim(),
-                composer: document.getElementById('composer').value.trim(),
-                category: document.getElementById('category').value,
-                language: document.getElementById('language').value,
-                description: document.getElementById('description').value.trim(),
-                whenToSing: document.getElementById('whenToSing').value.trim(),
-                pdfUrl: document.getElementById('pdfUrl').value.trim(),
-                audioUrl: document.getElementById('audioUrl').value.trim()
-            };
-            
-            if (!songData.title || !songData.composer || !songData.category || !songData.language || !songData.slug) {
-                showAlert('Please fill in all required fields (Title, Composer, Category, Language, Slug)', 'error');
-                return;
-            }
-            
-            if (!/^[a-z0-9-]+$/.test(songData.slug)) {
-                showAlert('Slug can only contain lowercase letters, numbers, and hyphens', 'error');
-                return;
-            }
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Adding...';
-            
-            try {
-                const response = await fetch(`${API_BASE}/songs`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(songData)
-                });
-                
-                const result = await response.json();
-                
-                if (!response.ok) throw new Error(result.message || 'Failed to add song');
-                
-                showAlert(`✅ "${songData.title}" has been added to the archive!`, 'success');
-                resetForm();
-                fetchSongs();
-            } catch (error) {
-                showAlert(`❌ Error: ${error.message}`, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '➕ Add Song to Archive';
+                showAlert(`❌ Delete failed`, 'error');
             }
         }
 
         function resetForm() {
             document.getElementById('addSongForm').reset();
+            document.getElementById('pdfUrl').value = '';
+            document.getElementById('audioUrl').value = '';
+            document.getElementById('pdfStatus').innerHTML = '';
+            document.getElementById('audioStatus').innerHTML = '';
             document.getElementById('title').focus();
         }
 
@@ -669,7 +700,6 @@
         document.getElementById('clearBtn').addEventListener('click', resetForm);
         document.getElementById('refreshBtn').addEventListener('click', fetchSongs);
         
-        testConnection();
         fetchSongs();
     </script>
 </body>
