@@ -6,6 +6,19 @@
     <title>Catholic Choir Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        /* Small addition for admin link styling */
+        nav a.admin-link {
+            background: rgba(196, 30, 58, 0.1);
+            border-radius: 20px;
+            padding: 5px 12px;
+            margin-left: 5px;
+        }
+        nav a.admin-link:hover {
+            background: rgba(196, 30, 58, 0.2);
+            color: var(--accent);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -16,6 +29,7 @@
                 <a href="songs.html">Songs</a>
                 <a href="composers.html">Composers</a>
                 <a href="about.html">About</a>
+                <a href="admin.html" class="admin-link">🔐 Admin</a>
             </nav>
         </div>
     </header>
@@ -25,8 +39,8 @@
             <h1>Catholic Sheet Music Archive</h1>
             <p>A digital archive preserving the rich tradition of sacred catholic music from Nigeria — from traditional Latin hymns to English, Igbo, Yoruba, Hausa hymns and other languages worldwide including contemporary compositions.</p>
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search songs, composers..." onkeypress="if(event.key === 'Enter') search()">
-                <button onclick="search()">Search</button>
+                <input type="text" id="searchInput" placeholder="Search songs, composers..." onkeypress="if(event.key === 'Enter') searchSongs()">
+                <button onclick="searchSongs()">Search</button>
             </div>
         </div>
         <div class="hero-visual"></div>
@@ -35,16 +49,20 @@
     <div class="main-layout">
         <section class="mass-section">
             <h2 class="section-title">Order of Mass</h2>
-            <ul class="mass-list" id="massList"></ul>
+            <ul class="mass-list" id="massList">
+                <li><div class="loading-spinner">Loading categories...</div></li>
+            </ul>
             <div class="stats-bar">
-                <div class="stat"><h3>12</h3><p>Songs</p></div>
-                <div class="stat"><h3>8</h3><p>Composers</p></div>
+                <div class="stat"><h3 id="songCount">--</h3><p>Songs</p></div>
+                <div class="stat"><h3 id="composerCount">--</h3><p>Composers</p></div>
             </div>
         </section>
 
         <section class="latest-section">
             <h2 class="section-title">Latest Additions</h2>
-            <div class="horizontal-scroll" id="latestList"></div>
+            <div class="horizontal-scroll" id="latestList">
+                <div class="loading-spinner">Loading latest songs...</div>
+            </div>
         </section>
     </div>
 
@@ -59,6 +77,176 @@
         </div>
     </footer>
 
-    <script src="JS/main.js"></script>
+    <script>
+        // API Configuration
+        const API_BASE = 'https://choir-archive-backendd.onrender.com/api';
+        
+        // Load all data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+        
+        // Global search function
+        window.searchSongs = function() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                window.location.href = `songs.html?search=${encodeURIComponent(query)}`;
+            } else {
+                window.location.href = 'songs.html';
+            }
+        };
+        
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE}/songs`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const songs = await response.json();
+                
+                // Update stats
+                updateStats(songs);
+                
+                // Update mass categories
+                updateMassCategories(songs);
+                
+                // Update latest additions
+                updateLatestAdditions(songs);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load songs. Please refresh the page.');
+            }
+        }
+        
+        function updateStats(songs) {
+            // Count unique composers
+            const uniqueComposers = new Set(songs.map(song => song.composer?.toLowerCase())).size;
+            
+            document.getElementById('songCount').textContent = songs.length;
+            document.getElementById('composerCount').textContent = uniqueComposers;
+        }
+        
+        function updateMassCategories(songs) {
+            // Define the order of mass categories
+            const categories = [
+                'Entrance', 'Gloria', 'Psalm', 'Alleluia', 
+                'Offertory', 'Sanctus', 'Agnus Dei', 'Communion', 'Recessional'
+            ];
+            
+            // Count songs per category
+            const categoryCount = {};
+            songs.forEach(song => {
+                const cat = song.category;
+                if (cat) {
+                    categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+                }
+            });
+            
+            // Filter categories that have songs
+            const activeCategories = categories.filter(cat => categoryCount[cat] > 0);
+            
+            const massList = document.getElementById('massList');
+            
+            if (activeCategories.length === 0) {
+                massList.innerHTML = '<li><div class="empty-message">No songs added yet. Check back soon!</div></li>';
+                return;
+            }
+            
+            massList.innerHTML = activeCategories.map(category => `
+                <li class="mass-item">
+                    <a href="songs.html?category=${encodeURIComponent(category)}">
+                        <span class="name">${escapeHtml(category)}</span>
+                        <span class="count">${categoryCount[category]} song${categoryCount[category] !== 1 ? 's' : ''}</span>
+                    </a>
+                </li>
+            `).join('');
+            
+            // Also add "Other" category if there are uncategorized songs
+            const otherCategories = Object.keys(categoryCount).filter(cat => !categories.includes(cat));
+            if (otherCategories.length > 0) {
+                const otherCount = otherCategories.reduce((sum, cat) => sum + categoryCount[cat], 0);
+                massList.innerHTML += `
+                    <li class="mass-item">
+                        <a href="songs.html?category=Other">
+                            <span class="name">Other</span>
+                            <span class="count">${otherCount} song${otherCount !== 1 ? 's' : ''}</span>
+                        </a>
+                    </li>
+                `;
+            }
+        }
+        
+        function updateLatestAdditions(songs) {
+            const latestContainer = document.getElementById('latestList');
+            
+            if (!songs.length) {
+                latestContainer.innerHTML = '<div class="empty-message">No songs added yet. Check back soon!</div>';
+                return;
+            }
+            
+            // Songs are already ordered by date_added DESC from backend
+            // Take first 8 songs for latest additions
+            const latestSongs = songs.slice(0, 8);
+            
+            latestContainer.innerHTML = latestSongs.map(song => `
+                <div class="song-card" onclick="window.location.href='song.html?slug=${encodeURIComponent(song.slug)}'">
+                    <div class="category">${escapeHtml(song.category || 'General')}</div>
+                    <h4>${escapeHtml(song.title)}</h4>
+                    <div class="composer">${escapeHtml(song.composer || 'Unknown')}</div>
+                    <div class="meta">
+                        ${song.language ? escapeHtml(song.language) : ''}
+                        ${song.when_to_sing ? `<span class="meta-tag">• ${escapeHtml(song.when_to_sing.substring(0, 30))}${song.when_to_sing.length > 30 ? '...' : ''}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showError(message) {
+            const massList = document.getElementById('massList');
+            const latestList = document.getElementById('latestList');
+            
+            if (massList) massList.innerHTML = `<li><div class="error-message">${message}</div></li>`;
+            if (latestList) latestList.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Add loading spinner styles (if not in your CSS)
+        const style = document.createElement('style');
+        style.textContent = `
+            .loading-spinner {
+                text-align: center;
+                padding: 20px;
+                color: #666;
+            }
+            .empty-message {
+                text-align: center;
+                padding: 20px;
+                color: #999;
+                font-style: italic;
+            }
+            .error-message {
+                text-align: center;
+                padding: 20px;
+                color: #c41e3a;
+            }
+            .meta-tag {
+                font-size: 0.7rem;
+                color: #888;
+                margin-left: 5px;
+            }
+            .song-card {
+                cursor: pointer;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
