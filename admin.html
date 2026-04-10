@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel · Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #faf9f6;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --accent: #c41e3a;
+            --accent-light: #e8d5d8;
+            --border: #e5e5e5;
+            --card: #ffffff;
+            --success: #2e7d32;
+            --error: #c62828;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .admin-header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .admin-badge {
+            background: var(--accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .view-site {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.9rem;
+        }
+
+        .view-site:hover {
+            color: var(--accent);
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border-left: 4px solid var(--error);
+            color: var(--error);
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            color: #1565c0;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-container {
+                padding: 20px;
+            }
+            .admin-header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 25px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header i {
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        label .required {
+            color: var(--accent);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            background: var(--card);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #a01830;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #d4d4d4;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .songs-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .songs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .songs-table th {
+            text-align: left;
+            padding: 12px 8px;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .songs-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .song-title {
+            font-weight: 600;
+        }
+
+        .song-composer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .category-badge {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px 10px;
+            transition: opacity 0.3s;
+        }
+
+        .delete-btn:hover {
+            opacity: 0.7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .slug-preview {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        .status-offline {
+            background: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="admin-header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span> · ADMIN</div>
+            <div>
+                <span class="admin-badge"><span id="connectionStatus" class="status-badge status-offline"></span> 🔐 Admin Console</span>
+                <a href="index.html" class="view-site">← View Site</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div id="alertContainer"></div>
+
+        <div class="admin-grid">
+            <!-- Add Song Form -->
+            <div class="card">
+                <div class="card-header">
+                    <i>➕</i> Add New Song
+                </div>
+                <div class="card-body">
+                    <form id="addSongForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Title <span class="required">*</span></label>
+                                <input type="text" id="title" required placeholder="e.g., Ave Maria">
+                            </div>
+                            <div class="form-group">
+                                <label>Composer <span class="required">*</span></label>
+                                <input type="text" id="composer" required placeholder="e.g., Franz Schubert">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category <span class="required">*</span></label>
+                                <select id="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Entrance">Entrance</option>
+                                    <option value="Gloria">Gloria</option>
+                                    <option value="Psalm">Psalm</option>
+                                    <option value="Alleluia">Alleluia</option>
+                                    <option value="Offertory">Offertory</option>
+                                    <option value="Sanctus">Sanctus</option>
+                                    <option value="Agnus Dei">Agnus Dei</option>
+                                    <option value="Communion">Communion</option>
+                                    <option value="Recessional">Recessional</option>
+                                    <option value="Traditional Igbo">Traditional Igbo</option>
+                                    <option value="Yoruba Hymn">Yoruba Hymn</option>
+                                    <option value="Hausa">Hausa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Language <span class="required">*</span></label>
+                                <select id="language" required>
+                                    <option value="">Select Language</option>
+                                    <option value="English">English</option>
+                                    <option value="Igbo">Igbo</option>
+                                    <option value="Yoruba">Yoruba</option>
+                                    <option value="Hausa">Hausa</option>
+                                    <option value="Latin">Latin</option>
+                                    <option value="Bilingual">Bilingual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Slug (URL identifier) <span class="required">*</span></label>
+                            <input type="text" id="slug" required placeholder="e.g., ave-maria-schubert">
+                            <div class="slug-preview">🔗 Will be: https://choir-archive-backendd.onrender.com/api/songs/your-slug</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>PDF URL (Cloudinary link)</label>
+                            <input type="url" id="pdfUrl" placeholder="https://res.cloudinary.com/.../song.pdf">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Audio URL (optional)</label>
+                            <input type="url" id="audioUrl" placeholder="https://.../audio.mp3">
+                        </div>
+
+                        <div class="form-group">
+                            <label>When to Sing (liturgical context)</label>
+                            <textarea id="whenToSing" placeholder="e.g., During Offertory, Advent season, Funeral Mass..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="description" placeholder="Additional notes about this piece..."></textarea>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">➕ Add Song to Archive</button>
+                            <button type="button" class="btn btn-secondary" id="clearBtn">Clear Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Manage Songs -->
+            <div class="card">
+                <div class="card-header">
+                    <i>📋</i> Manage Songs
+                    <span style="margin-left: auto; font-size: 0.75rem;" id="songCount"></span>
+                </div>
+                <div class="card-body">
+                    <div class="songs-table-wrapper">
+                        <table class="songs-table">
+                            <thead>
+                                <tr><th>Title / Composer</th><th>Category</th><th>Language</th><th style="width:60px"></th></tr>
+                            </thead>
+                            <tbody id="songsTableBody">
+                                <tr><td colspan="4" class="loading"><div class="spinner"></div> Connecting to server...</td></tr>
+                            </tbody>
+                         </table>
+                    </div>
+                    <div class="button-group" style="margin-top: 20px; justify-content: flex-end;">
+                        <button id="refreshBtn" class="btn btn-secondary btn-sm">⟳ Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your actual backend URL
+        const API_BASE = 'https://choir-archive-backendd.onrender.com/api';
+        
+        // Test connection on load
+        async function testConnection() {
+            const statusDot = document.getElementById('connectionStatus');
+            try {
+                const response = await fetch(`${API_BASE}/songs`);
+                if (response.ok) {
+                    statusDot.className = 'status-badge status-online';
+                    showAlert('✅ Connected to backend successfully!', 'success');
+                } else {
+                    statusDot.className = 'status-badge status-offline';
+                    showAlert(`⚠️ Backend returned status ${response.status}`, 'error');
+                }
+            } catch (error) {
+                statusDot.className = 'status-badge status-offline';
+                showAlert(`⚠️ Cannot connect to ${API_BASE}. Make sure your backend is running.`, 'error');
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => {
+                if (alert.parentNode) alert.remove();
+            }, 5000);
+        }
+
+        function generateSlug(title, composer) {
+            let slug = title.toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/--+/g, '-');
+            if (composer) {
+                slug += '-' + composer.toLowerCase().split(' ')[0];
+            }
+            return slug;
+        }
+
+        document.getElementById('title').addEventListener('input', function() {
+            const title = this.value;
+            const composer = document.getElementById('composer').value;
+            if (title && !document.getElementById('slug').value) {
+                document.getElementById('slug').value = generateSlug(title, composer);
+            }
+        });
+
+        document.getElementById('composer').addEventListener('input', function() {
+            const title = document.getElementById('title').value;
+            const composer = this.value;
+            if (title && composer && !document.getElementById('slug').value) {
+                document.getElementById('slug').value = generateSlug(title, composer);
+            }
+        });
+
+        async function fetchSongs() {
+            const tbody = document.getElementById('songsTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="loading"><div class="spinner"></div> Loading songs...</td></tr>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const songs = await response.json();
+                renderSongsTable(songs);
+                document.getElementById('songCount').innerHTML = `${songs.length} song${songs.length !== 1 ? 's' : ''}`;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                tbody.innerHTML = `<tr><td colspan="4" class="empty-state">❌ Cannot connect to server. Make sure backend is running at ${API_BASE}</td></tr>`;
+            }
+        }
+
+        function renderSongsTable(songs) {
+            const tbody = document.getElementById('songsTableBody');
+            if (!songs.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">📭 No songs yet. Add your first song using the form!</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = songs.map(song => `
+                <tr>
+                    <td>
+                        <div class="song-title">${escapeHtml(song.title)}</div>
+                        <div class="song-composer">${escapeHtml(song.composer)}</div>
+                    </td>
+                    <td><span class="category-badge">${escapeHtml(song.category)}</span></td>
+                    <td>${escapeHtml(song.language)}</td>
+                    <td><button class="delete-btn" data-slug="${escapeHtml(song.slug)}" data-title="${escapeHtml(song.title)}">🗑️</button></td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteSong(btn.dataset.slug, btn.dataset.title));
+            });
+        }
+
+        async function deleteSong(slug, title) {
+            if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs/${slug}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Delete failed');
+                showAlert(`✅ "${title}" has been deleted.`, 'success');
+                fetchSongs();
+            } catch (error) {
+                showAlert(`❌ Delete failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function addSong(event) {
+            event.preventDefault();
+            
+            const songData = {
+                slug: document.getElementById('slug').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                composer: document.getElementById('composer').value.trim(),
+                category: document.getElementById('category').value,
+                language: document.getElementById('language').value,
+                description: document.getElementById('description').value.trim(),
+                whenToSing: document.getElementById('whenToSing').value.trim(),
+                pdfUrl: document.getElementById('pdfUrl').value.trim(),
+                audioUrl: document.getElementById('audioUrl').value.trim()
+            };
+            
+            if (!songData.title || !songData.composer || !songData.category || !songData.language || !songData.slug) {
+                showAlert('Please fill in all required fields (Title, Composer, Category, Language, Slug)', 'error');
+                return;
+            }
+            
+            if (!/^[a-z0-9-]+$/.test(songData.slug)) {
+                showAlert('Slug can only contain lowercase letters, numbers, and hyphens', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Adding...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/songs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(songData)
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) throw new Error(result.message || 'Failed to add song');
+                
+                showAlert(`✅ "${songData.title}" has been added to the archive!`, 'success');
+                resetForm();
+                fetchSongs();
+            } catch (error) {
+                showAlert(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '➕ Add Song to Archive';
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('addSongForm').reset();
+            document.getElementById('title').focus();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        document.getElementById('addSongForm').addEventListener('submit', addSong);
+        document.getElementById('clearBtn').addEventListener('click', resetForm);
+        document.getElementById('refreshBtn').addEventListener('click', fetchSongs);
+        
+        testConnection();
+        fetchSongs();
+    </script>
+</body>
+</html>
