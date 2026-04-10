@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Nigerian Catholic Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .about-hero {
+            padding: 80px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .about-section {
+            margin-bottom: 60px;
+        }
+
+        .about-section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .about-section p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .about-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .about-section li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .about-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .team-member {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 30px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .team-member .avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .team-member h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .team-member p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .contact-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .contact-box p {
+            margin-bottom: 20px;
+        }
+
+        .contact-box a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-box a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span></div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="songs.html">Songs</a>
+                <a href="composers.html">Composers</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="about-hero">
+        <h1>About the Archive</h1>
+        <p>Preserving Nigeria's sacred choral tradition for future generations of worshippers, choirmasters, and music lovers.</p>
+    </div>
+
+    <div class="about-content">
+        <div class="about-section">
+            <h2>Our Mission</h2>
+            <p>The Nigerian Catholic Choir Archive is a digital repository dedicated to collecting, preserving, and sharing the rich tradition of Catholic choral music from Nigeria. From the iconic compositions of Sir Jude Nnam to traditional Igbo hymns, we ensure these sacred works remain accessible to choirs worldwide.</p>
+            <p>Many Nigerian Catholic choirs struggle to find sheet music for popular songs. This archive solves that problem by providing a centralized, searchable database of choral works.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>What We Archive</h2>
+            <ul>
+                <li>Entrance hymns and processional songs</li>
+                <li>Mass parts (Kyrie, Gloria, Sanctus, Agnus Dei)</li>
+                <li>Offertory and Communion songs</li>
+                <li>Responsorial Psalms and Gospel Acclamations</li>
+                <li>Marian hymns and devotional songs</li>
+                <li>Works in Igbo, English, Latin, and other Nigerian languages</li>
+            </ul>
+        </div>
+
+        <div class="about-section">
+            <h2>Featured Composers</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar">🎵</div>
+                    <h4>Sir Jude Nnam</h4>
+                    <p>Nigeria's most prolific Catholic composer with over 2,000 works</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">🎼</div>
+                    <h4>Prof. Laz Ekwueme</h4>
+                    <p>First professor of music in Nigeria, composer of "Obi Dimkpa"</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">🎹</div>
+                    <h4>Rev. Fr. John Okonkwo</h4>
+                    <p>Composer of "Priestly People" and other liturgical works</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-section">
+            <h2>Contribute</h2>
+            <div class="contact-box">
+                <p>Have sheet music to share? Help us grow the archive.</p>
+                <p>Email us at <a href="mailto:contribute@choirarchive.ng">contribute@choirarchive.ng</a></p>
+                <p style="margin-top: 20px; font-size: 0.9rem;">All submissions are reviewed for accuracy and copyright compliance.</p>
+            </div>
+        </div>
+
+        <div class="about-section">
+            <h2>Copyright Notice</h2>
+            <p>This archive is intended for educational and liturgical use. We respect the rights of composers and publishers. If you own the rights to any material here and wish to have it removed, please contact us immediately.</p>
+            <p>Many Nigerian Catholic songs are shared freely within the Church community. This site aims to facilitate that sharing while giving proper credit to composers.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CHOIR ARCHIVE</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="songs.html">All Songs</a>
+                <a href="submit.html">Contribute</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

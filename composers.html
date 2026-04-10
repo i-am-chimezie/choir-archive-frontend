@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Composers - Nigerian Catholic Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .composers-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .composers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .composer-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 35px;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .composer-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        }
+
+        .composer-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .composer-card .song-count {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .composer-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .view-works {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .view-works:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span></div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="songs.html">Songs</a>
+                <a href="composers.html">Composers</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h1>Composers</h1>
+            <p>The talented musicians behind Nigeria's sacred choral tradition</p>
+        </div>
+    </div>
+
+    <div class="composers-container">
+        <div class="composers-grid" id="composersGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CHOIR ARCHIVE</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="songs.html">All Songs</a>
+                <a href="submit.html">Contribute</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        const composersData = [
+            {
+                name: "Sir Jude Nnam",
+                songs: 4,
+                bio: "Nigeria's most prolific Catholic composer with over 2,000 compositions. Yamaha artist and conductor of the Papal choir during Benedict XVI's visit."
+            },
+            {
+                name: "Prof. Laz Ekwueme",
+                songs: 1,
+                bio: "Nigeria's first professor of music and traditional ruler of Oko Kingdom. Pioneer of Igbo choral music."
+            },
+            {
+                name: "Rev. Fr. John Okonkwo",
+                songs: 1,
+                bio: "Composer of 'Priestly People' and other liturgical works for Enugu diocese."
+            },
+            {
+                name: "Rev. Fr. Bartholomew Ezeokafor",
+                songs: 1,
+                bio: "Composer of 'Omeokachie' and other Igbo devotional songs."
+            },
+            {
+                name: "Nnoke John",
+                songs: 1,
+                bio: "Composer of 'Chi Mara Obim' (The Lord knows my heart)."
+            }
+        ];
+
+        function displayComposers() {
+            const container = document.getElementById('composersGrid');
+            
+            container.innerHTML = composersData.map(composer => `
+                <div class="composer-card">
+                    <h3>${composer.name}</h3>
+                    <div class="song-count">${composer.songs} song${composer.songs > 1 ? 's' : ''} in archive</div>
+                    <p>${composer.bio}</p>
+                    <a href="songs.html" class="view-works">View works →</a>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', displayComposers);
+    </script>
+</body>
+</html>

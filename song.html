@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song - Nigerian Catholic Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .song-header {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .song-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .song-composer {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .song-meta-bar {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item .label {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .song-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .preview-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 4px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, var(--accent-light) 0%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .preview-placeholder::before {
+            content: '♫';
+            font-size: 100px;
+            color: var(--accent);
+            opacity: 0.3;
+        }
+
+        .preview-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .details-section h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .detail-item {
+            margin-bottom: 25px;
+        }
+
+        .detail-item h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .detail-item p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .download-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+        }
+
+        .download-btn.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .download-btn.secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: none;
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 100px 40px;
+        }
+
+        .not-found h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .song-content {
+                grid-template-columns: 1fr;
+                padding: 30px 20px;
+            }
+
+            .song-header {
+                padding: 40px 20px;
+            }
+
+            .song-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span></div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="songs.html">Songs</a>
+                <a href="composers.html">Composers</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div id="songContainer">
+        <!-- Populated by JS -->
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CHOIR ARCHIVE</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="songs.html">All Songs</a>
+                <a href="submit.html">Contribute</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+    const API_URL = 'https://choir-archive-backendd.onrender.com/api';
+
+    // Get song from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const songSlug = urlParams.get('song');
+
+    async function getSong(slug) {
+        const response = await fetch(`${API_URL}/songs/${slug}`);
+        return await response.json();
+    }
+
+    async function displaySong() {
+        const container = document.getElementById('songContainer');
+        
+        if (!songSlug) {
+            container.innerHTML = `
+                <div class="not-found">
+                    <h2>Song Not Found</h2>
+                    <p>No song specified. Please select a song from the <a href="index.html" style="color: var(--accent);">homepage</a>.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const song = await getSong(songSlug);
+
+        if (!song) {
+            container.innerHTML = `
+                <div class="not-found">
+                    <h2>Song Not Found</h2>
+                    <p>The song you're looking for doesn't exist. Go back to <a href="index.html" style="color: var(--accent);">homepage</a>.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="song-header">
+                <div style="max-width: 1200px; margin: 0 auto;">
+                    <a href="category.html?cat=${song.category}" class="back-link">← Back to ${song.category}</a>
+                    <h1 class="song-title">${song.title}</h1>
+                    <p class="song-composer">${song.composer}</p>
+                    <div class="song-meta-bar">
+                        <div class="meta-item">
+                            <span class="label">Category:</span>
+                            <span>${song.category}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">Language:</span>
+                            <span>${song.language}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">Added:</span>
+                            <span>${song.dateAdded}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="song-content">
+                <div class="preview-section">
+                    <div class="preview-placeholder"></div>
+                    <p class="preview-text">Sheet music preview will appear here</p>
+                </div>
+
+                <div class="details-section">
+                    <h2>Song Details</h2>
+                    
+                    <div class="detail-item">
+                        <h4>Description</h4>
+                        <p>${song.description || 'No description available.'}</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <h4>When to Sing</h4>
+                        <p>${song.whenToSing || 'Appropriate for this part of the Mass.'}</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <h4>Composer</h4>
+                        <p>${song.composer}</p>
+                    </div>
+
+                    <div class="download-section">
+                        <h2>Download</h2>
+                        ${song.pdfUrl ? `
+                            <a href="${song.pdfUrl}" class="download-btn" target="_blank">
+                                <span>📄</span> Download PDF
+                            </a>
+                        ` : `
+                            <a href="#" class="download-btn" onclick="alert('PDF coming soon!'); return false;">
+                                <span>📄</span> Download PDF
+                            </a>
+                        `}
+                        ${song.audioUrl ? `
+                            <a href="${song.audioUrl}" class="download-btn secondary" target="_blank">
+                                <span>🎵</span> Download Audio
+                            </a>
+                        ` : `
+                            <a href="#" class="download-btn secondary" onclick="alert('Audio coming soon!'); return false;">
+                                <span>🎵</span> Download Audio
+                            </a>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    document.addEventListener('DOMContentLoaded', displaySong);
+</script>

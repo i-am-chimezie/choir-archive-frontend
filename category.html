@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category - Nigerian Catholic Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .category-header {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .category-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .category-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .songs-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .song-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .song-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .song-item .category-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .song-item h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .song-item .composer {
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .song-item .meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span></div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="songs.html">Songs</a>
+                <a href="composers.html">Composers</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="category-header">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <a href="index.html" class="back-link">← Back to Home</a>
+            <h1 id="categoryTitle">Category</h1>
+            <p id="categoryDesc">Songs for this part of the Mass</p>
+        </div>
+    </div>
+
+    <div class="songs-grid" id="songsGrid">
+        <!-- Populated by JS -->
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CHOIR ARCHIVE</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="songs.html">All Songs</a>
+                <a href="submit.html">Contribute</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+    const API_URL = 'https://choir-archive-backendd.onrender.com/api';
+
+    // Get category from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const categorySlug = urlParams.get('cat');
+
+    // Category names mapping
+    const categoryNames = {
+        "entrance": "Entrance",
+        "kyrie": "Kyrie",
+        "gloria": "Gloria",
+        "psalm": "Responsorial Psalm",
+        "gospel-acclamation": "Gospel Acclamation",
+        "offertory": "Offertory",
+        "sanctus": "Sanctus",
+        "agnus-dei": "Agnus Dei",
+        "communion": "Communion",
+        "recessional": "Recessional",
+        "marian": "Marian Hymns"
+    };
+
+    async function getSongsByCategory(category) {
+        const response = await fetch(`${API_URL}/songs/category/${category}`);
+        return await response.json();
+    }
+
+    // Display category
+    async function displayCategory() {
+        const title = document.getElementById('categoryTitle');
+        const desc = document.getElementById('categoryDesc');
+        const grid = document.getElementById('songsGrid');
+        
+        if (!categorySlug || !categoryNames[categorySlug]) {
+            title.textContent = "Category Not Found";
+            desc.textContent = "Please select a valid category from the homepage.";
+            grid.innerHTML = '';
+            return;
+        }
+
+        title.textContent = categoryNames[categorySlug];
+        desc.textContent = `All songs for the ${categoryNames[categorySlug]} part of the Mass`;
+
+        const categorySongs = await getSongsByCategory(categorySlug);
+
+        if (categorySongs.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <h3>No songs yet</h3>
+                    <p>Songs for this category will be added soon.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = categorySongs.map(song => `
+            <div class="song-item" onclick="goToSong('${song.slug}')">
+                <div class="category-tag">${song.category}</div>
+                <h3>${song.title}</h3>
+                <p class="composer">${song.composer}</p>
+                <div class="meta">${song.language} • ${song.dateAdded}</div>
+            </div>
+        `).join('');
+    }
+
+    function goToSong(slug) {
+        window.location.href = `song.html?song=${slug}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', displayCategory);
+</script>

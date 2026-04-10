@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigerian Catholic Choir Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">CHOIR<span>ARCHIVE</span></div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="songs.html">Songs</a>
+                <a href="composers.html">Composers</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div>
+            <h1>Nigerian Catholic Choral Music</h1>
+            <p>A digital archive preserving the rich tradition of sacred music from Nigeria — from traditional Igbo hymns to contemporary compositions.</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search songs, composers..." onkeypress="if(event.key === 'Enter') search()">
+                <button onclick="search()">Search</button>
+            </div>
+        </div>
+        <div class="hero-visual"></div>
+    </section>
+
+    <div class="main-layout">
+        <section class="mass-section">
+            <h2 class="section-title">Order of Mass</h2>
+            <ul class="mass-list" id="massList"></ul>
+            <div class="stats-bar">
+                <div class="stat"><h3>12</h3><p>Songs</p></div>
+                <div class="stat"><h3>8</h3><p>Composers</p></div>
+            </div>
+        </section>
+
+        <section class="latest-section">
+            <h2 class="section-title">Latest Additions</h2>
+            <div class="horizontal-scroll" id="latestList"></div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">CHOIR ARCHIVE</div>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="songs.html">All Songs</a>
+                <a href="submit.html">Contribute</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="JS/main.js"></script>
+</body>
+</html>
